@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nukki Presale</title>
     <link rel="stylesheet" href="style.css" />
-
-    <!-- Corect: trebuie să fie bundle, nu ui@latest -->
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.7/dist/tonconnect-ui.min.js"></script>
-
-    <!-- Conectăm logica aplicației -->
-    <script src="app.js" defer></script>
   </head>
   <body>
     <div class="container">
@@ -25,5 +19,9 @@
         <button class="buy-pack" data-pack="mythic">Cumpără Mythic Pack</button>
       </div>
     </div>
+
+    <!-- ⚡ Important: bibliotecile trebuie încărcate la final -->
+    <script src="https://unpkg.com/@tonconnect/ui@2.0.7/dist/tonconnect-ui.min.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
