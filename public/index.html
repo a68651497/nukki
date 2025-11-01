@@ -1,17 +1,43 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="ro">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Joc Telegram</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="app">
-    <h1>Bine ai venit</h1>
-    <p>Aici se va încărca jocul tău — fundalul este configurat în style.css</p>
-  </div>
-  <script src="script.js" defer></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nukki Presale</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/@tonconnect/ui@latest"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎁 Nukki Presale</h1>
+      <p>Conectează portofelul și cumpără pack-uri limitate!</p>
+
+      <button id="connect-wallet">🔗 Conectează Wallet</button>
+
+      <div class="packs">
+        <div class="pack">
+          <h2>Starter Pack</h2>
+          <p>💰 2 TON — 3000 bucăți</p>
+          <p>🎲 90% Common / 10% Epic</p>
+          <button class="buy-btn" data-pack="starter">Cumpără</button>
+        </div>
+
+        <div class="pack">
+          <h2>Epic Pack</h2>
+          <p>💰 15 TON — 1500 bucăți</p>
+          <p>🎲 40% Legendary / 40% Epic / 20% Rare</p>
+          <button class="buy-btn" data-pack="epic">Cumpără</button>
+        </div>
+
+        <div class="pack">
+          <h2>Mythic Pack</h2>
+          <p>💰 50 TON — 500 bucăți</p>
+          <p>🎲 76% Mythic / 24% Legendary</p>
+          <button class="buy-btn" data-pack="mythic">Cumpără</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
 </html>
