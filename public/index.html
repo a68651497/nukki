@@ -1,45 +1,42 @@
 <!DOCTYPE html>
 <html lang="ro">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nukki Presale</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://unpkg.com/@tonconnect/ui@latest"></script>
-  </head>
-  <body>
-    <div class="container">
-      <h1>🎁 Nukki Presale</h1>
-      <p>Conectează portofelul și cumpără pack-uri limitate!</p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nukki Presale</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/@tonconnect/ui@latest" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header>
+    <div id="wallet-status">🔴 Neconectat</div>
+  </header>
 
-      <button id="connect-wallet">🔗 Conectează Wallet</button>
+  <main class="container">
+    <h1>🐾 Presale Nukki Packs</h1>
 
-      <div class="packs">
-        <div class="pack">
-          <h2>Starter Pack</h2>
-          <p>💰 2 TON — 3000 bucăți</p>
-          <p>🎲 90% Common / 10% Epic</p>
-          <button class="buy-btn" data-pack="starter">Cumpără</button>
-        </div>
+    <div id="packs">
+      <div class="pack" data-pack="starter">
+        <h3>Starter Pack</h3>
+        <p>🎁 2 TON • 3000 buc • 90% Common / 10% Epic</p>
+        <button class="buy-btn">Cumpără</button>
+      </div>
 
-        <div class="pack">
-          <h2>Epic Pack</h2>
-          <p>💰 15 TON — 1500 bucăți</p>
-          <p>🎲 40% Legendary / 40% Epic / 20% Rare</p>
-          <button class="buy-btn" data-pack="epic">Cumpără</button>
-        </div>
+      <div class="pack" data-pack="epic">
+        <h3>Epic Pack</h3>
+        <p>💎 15 TON • 1500 buc • 40% Legendary / 40% Epic / 20% Rare</p>
+        <button class="buy-btn">Cumpără</button>
+      </div>
 
-        <div class="pack">
-          <h2>Mythic Pack</h2>
-          <p>💰 50 TON — 500 bucăți</p>
-          <p>🎲 76% Mythic / 24% Legendary</p>
-          <button class="buy-btn" data-pack="mythic">Cumpără</button>
-        </div>
+      <div class="pack" data-pack="mythic">
+        <h3>Mythic Pack</h3>
+        <p>🔥 50 TON • 500 buc • 76% Mythic / 24% Legendary</p>
+        <button class="buy-btn">Cumpără</button>
       </div>
     </div>
 
-    <script src="https://unpkg.com/@tonconnect/ui@latest" defer></script>
-<script src="app.js"></script>
-
-  </body>
+    <div id="result"></div>
+  </main>
+</body>
 </html>

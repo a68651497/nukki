@@ -1,52 +1,73 @@
-const tonConnect = new TON_CONNECT_UI.TonConnectUI({
-  manifestUrl: "https://nukki.onrender.com/tonconnect-manifest.json",
+
+const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+    manifestUrl: "https://nukki.onrender.com/tonconnect-manifest.json"
 });
 
-const connectButton = document.getElementById("connect-wallet");
-connectButton.addEventListener("click", async () => {
-  try {
-    await tonConnect.connectWallet();
-    alert("✅ Wallet conectat!");
-  } catch (err) {
-    alert("❌ Eroare la conectare");
-    console.error(err);
-  }
+let walletConnected = false;
+let userWallet = null;
+
+// === STATUS WALLET ===
+const statusEl = document.getElementById("wallet-status");
+
+// actualizează UI dacă walletul este deja conectat
+tonConnectUI.onStatusChange(wallet => {
+    if (wallet) {
+        walletConnected = true;
+        userWallet = wallet.account.address;
+        statusEl.textContent = `🟢 Conectat: ${userWallet.slice(0, 6)}...${userWallet.slice(-4)}`;
+    } else {
+        walletConnected = false;
+        userWallet = null;
+        statusEl.textContent = "🔴 Neconectat";
+    }
 });
 
+// === LOGICA DE CUMPĂRARE ===
 const prices = {
-  starter: 2,
-  epic: 15,
-  mythic: 50,
+    starter: 2,
+    epic: 15,
+    mythic: 50
 };
 
-const receiver = "UQDgSjZPtVTOQzLTb0KuFDC0JNMMuJ8ifle3Fcm0EQ5qmtre"; // <<< Schimbă cu adresa ta
+const ownedPacks = {};
 
-document.querySelectorAll(".buy-btn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const type = btn.dataset.pack;
-    const amount = prices[type];
+document.querySelectorAll(".buy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+        const packType = btn.closest(".pack").dataset.pack;
+        const price = prices[packType];
 
-    if (!tonConnect.connected) {
-      alert("Conectează-ți mai întâi walletul!");
-      return;
-    }
+        if (!walletConnected) {
+            alert("Conectează mai întâi walletul tău TON!");
+            return;
+        }
 
-    const transaction = {
-      validUntil: Math.floor(Date.now() / 1000) + 300,
-      messages: [
-        {
-          address: receiver,
-          amount: (amount * 1_000_000_000).toString(), // conversie TON → nanotons
-        },
-      ],
-    };
+        if (ownedPacks[packType]) {
+            alert("Deja ai cumpărat acest pack!");
+            return;
+        }
 
-    try {
-      await tonConnect.sendTransaction(transaction);
-      alert(`✅ Ai cumpărat un ${type} pack pentru ${amount} TON!`);
-    } catch (err) {
-      console.error(err);
-      alert("❌ Tranzacție anulată sau eșuată.");
-    }
-  });
+        try {
+            const tx = {
+                validUntil: Math.floor(Date.now() / 1000) + 60,
+                messages: [
+                    {
+                        address: "EQB4L_gwbXq5ZkzG5nHCvJ1g6XYn5-EXAMPLETONADDRESS", // adresa TON a jocului tău (schimb-o ulterior)
+                        amount: (price * 1e9).toString(), // 1 TON = 1e9 nanotons
+                        payload: btoa(`Cumparare ${packType} pack`)
+                    }
+                ]
+            };
+
+            await tonConnectUI.sendTransaction(tx);
+
+            ownedPacks[packType] = true;
+            btn.textContent = "Deținut ✅";
+            btn.classList.add("owned");
+            document.getElementById("result").innerText = `Ai cumpărat ${packType} pack pentru ${price} TON!`;
+
+        } catch (err) {
+            console.error(err);
+            alert("Tranzacția a fost anulată sau a eșuat.");
+        }
+    });
 });
