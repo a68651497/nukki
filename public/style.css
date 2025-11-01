@@ -1,0 +1,39 @@
+/* public/style.css */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  min-height: 100vh;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  /* FUNDAL GRADIENT (implicit) */
+  background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Dacă vrei să folosești o imagine în loc de gradient:
+   1. Pune imaginea în public/assets/bg.jpg
+   2. Deblochează liniile de mai jos (șterge /* */)
+*/
+/*
+body {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)),
+    url('assets/bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+*/
+
+/* Container pentru conținutul jocului (centrare și padding) */
+#app {
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  text-align: center;
+}
