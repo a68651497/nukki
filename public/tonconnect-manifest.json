@@ -1,0 +1,12 @@
+{
+  "url": "https://nukki.onrender.com",
+  "name": "Nukki Presale",
+  "iconUrl": "https://nukki.onrender.com/icon.png",
+  "termsOfUseUrl": "https://nukki.onrender.com/terms",
+  "privacyPolicyUrl": "https://nukki.onrender.com/privacy",
+  "bridge": {
+    "url": "https://bridge.tonapi.io/bridge"
+  },
+  "platforms": ["ios", "android", "web"],
+  "manifestVersion": 2
+}

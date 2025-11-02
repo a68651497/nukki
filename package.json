@@ -1,17 +1,36 @@
 {
-  "name": "nukki",
+  "name": "nukki-presale",
   "version": "1.0.0",
-  "description": "",
+  "description": "Nukki Presale Platform - TON Web3 purchase system with Express, PostgreSQL, and TonConnect integration.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "migrate": "psql $DATABASE_URL -f db/schema.sql"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "engines": {
+    "node": ">=18.x"
+  },
   "dependencies": {
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "node-telegram-bot-api": "^0.66.0"
-  }
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "keywords": [
+    "TON",
+    "Web3",
+    "Presale",
+    "Express",
+    "PostgreSQL",
+    "Crypto",
+    "TonConnect"
+  ],
+  "author": "Nukki Team",
+  "license": "MIT"
 }

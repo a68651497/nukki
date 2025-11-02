@@ -1,27 +1,68 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nukki Presale</title>
+    <title>Nukki Presale | NFT Packs</title>
     <link rel="stylesheet" href="style.css" />
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
   </head>
   <body>
-    <div class="container">
-      <h1>🔥 Nukki Presale 🔥</h1>
+    <div class="background"></div>
 
-      <button id="connect-wallet">Conectează Wallet</button>
-      <p id="wallet-status">Neconectat ❌</p>
-
-      <div class="packs">
-        <button class="buy-pack" data-pack="starter">Cumpără Starter Pack</button>
-        <button class="buy-pack" data-pack="epic">Cumpără Epic Pack</button>
-        <button class="buy-pack" data-pack="mythic">Cumpără Mythic Pack</button>
+    <header class="header">
+      <div class="logo">
+        <img src="icon.png" alt="Nukki Logo" />
+        <h1>Nukki Presale</h1>
       </div>
-    </div>
+      <button id="connectWallet" class="btn connect-btn">Connect Wallet</button>
+      <span id="walletAddress" class="wallet-info"></span>
+    </header>
 
-    <!-- ⚡ Important: bibliotecile trebuie încărcate la final -->
-    <script src="https://unpkg.com/@tonconnect/ui@2.0.7/dist/tonconnect-ui.min.js"></script>
+    <main class="main-content">
+      <section class="packs-section">
+        <h2>Choose Your Pack</h2>
+        <div class="packs-container">
+          <div class="pack-card starter">
+            <h3>Starter Pack</h3>
+            <p class="price">2 TON</p>
+            <p class="desc">90% Common | 10% Epic</p>
+            <p class="limit">Limit: 3000 Packs</p>
+            <button class="buy-btn" data-pack="starter">Buy Starter</button>
+          </div>
+
+          <div class="pack-card epic">
+            <h3>Epic Pack</h3>
+            <p class="price">15 TON</p>
+            <p class="desc">40% Legendary | 40% Epic | 20% Rare</p>
+            <p class="limit">Limit: 1500 Packs</p>
+            <button class="buy-btn" data-pack="epic">Buy Epic</button>
+          </div>
+
+          <div class="pack-card mythic">
+            <h3>Mythic Pack</h3>
+            <p class="price">50 TON</p>
+            <p class="desc">76% Mythic | 24% Legendary</p>
+            <p class="limit">Limit: 500 Packs</p>
+            <button class="buy-btn" data-pack="mythic">Buy Mythic</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="referral-section">
+        <h2>Referral System</h2>
+        <p>Invite friends & earn <b>2% TON</b> + <b>50 FOOD</b> per referred buyer.</p>
+      </section>
+
+      <button class="whitepaper-btn" onclick="window.open('#','_blank')">
+        Whitepaper
+      </button>
+    </main>
+
+    <footer class="footer">
+      <p>© 2025 Nukki Game | All Rights Reserved</p>
+    </footer>
+
     <script src="app.js"></script>
   </body>
 </html>
