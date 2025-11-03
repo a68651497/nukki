@@ -6,94 +6,115 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 dotenv.config();
-const { Pool } = pg;
 
-// 🗂️ Configurare directoare
+// 📁 Configurare de bază
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// 🔗 Conectare la baza de date PostgreSQL
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
-
-// 🧱 Inițializare Express
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// 🔥 Test conexiune DB
-(async () => {
-  try {
-    await pool.query("SELECT NOW()");
-    console.log("✅ Conectat la baza de date PostgreSQL");
-  } catch (err) {
-    console.error("❌ Eroare la conectarea DB:", err);
-  }
-})();
+// 🔌 Conexiune PostgreSQL
+const { Pool } = pg;
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+});
 
-// 📦 Endpoint pentru cumpărare pack
-app.post("/api/buy", async (req, res) => {
+pool
+  .connect()
+  .then(() => console.log("✅ Conectat la baza de date PostgreSQL"))
+  .catch((err) => console.error("❌ Eroare conexiune DB:", err));
+
+// 🌍 Route principală (frontend)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+//
+// 📦 API ROUTES
+//
+
+// 🧾 Obține lista de pachete
+app.get("/api/packs", async (req, res) => {
   try {
-    const { wallet, pack } = req.body;
-    if (!wallet || !pack) {
-      return res.status(400).json({ success: false, message: "Date incomplete." });
+    const { rows } = await pool.query("SELECT * FROM packs ORDER BY id ASC");
+    res.json(rows);
+  } catch (err) {
+    console.error("Eroare la /api/packs:", err);
+    res.status(500).json({ error: "Eroare la preluarea pachetelor" });
+  }
+});
+
+// 👤 Înregistrare / actualizare utilizator
+app.post("/api/user", async (req, res) => {
+  const { wallet, ref } = req.body;
+  if (!wallet) return res.status(400).json({ error: "Lipsește wallet-ul" });
+
+  try {
+    let user = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
+    if (user.rows.length === 0) {
+      await pool.query(
+        "INSERT INTO users (wallet_address, referred_by) VALUES ($1, $2)",
+        [wallet, ref || null]
+      );
+      user = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
     }
-
-    // Obține info despre pachet
-    const packData = await pool.query("SELECT * FROM packs WHERE name = $1", [pack]);
-    if (packData.rows.length === 0)
-      return res.status(404).json({ success: false, message: "Pachet inexistent." });
-
-    const selectedPack = packData.rows[0];
-
-    // Verifică stoc disponibil
-    if (selectedPack.remaining <= 0)
-      return res.status(400).json({ success: false, message: "Pachet epuizat." });
-
-    // Verifică limitele pe utilizator
-    const userPurchases = await pool.query(
-      "SELECT COUNT(*) FROM purchases WHERE wallet = $1 AND pack_name = $2",
-      [wallet, pack]
-    );
-
-    const limit = getPackLimit(pack);
-    if (parseInt(userPurchases.rows[0].count) >= limit)
-      return res.status(400).json({
-        success: false,
-        message: `Ai atins limita pentru ${pack} pack.`,
-      });
-
-    // Înregistrează cumpărarea
-    await pool.query(
-      "INSERT INTO purchases (wallet, pack_name, price, created_at) VALUES ($1, $2, $3, NOW())",
-      [wallet, pack, selectedPack.price]
-    );
-
-    // Actualizează stocul
-    await pool.query("UPDATE packs SET remaining = remaining - 1 WHERE name = $1", [pack]);
-
-    res.json({ success: true, message: `Ai cumpărat ${pack} pack cu succes!` });
+    res.json(user.rows[0]);
   } catch (err) {
-    console.error("Eroare la cumpărare:", err);
-    res.status(500).json({ success: false, message: "Eroare server." });
+    console.error("Eroare la /api/user:", err);
+    res.status(500).json({ error: "Eroare la înregistrare utilizator" });
   }
 });
 
-// 🧮 Funcție pentru limite per utilizator
-function getPackLimit(pack) {
-  switch (pack) {
-    case "starter": return 4;
-    case "epic": return 2;
-    case "mythic": return 1;
-    default: return 1;
-  }
-}
+// 💰 Achiziționare pachet
+app.post("/api/purchase", async (req, res) => {
+  const { wallet, packId, tonSpent, txHash } = req.body;
+  if (!wallet || !packId || !tonSpent)
+    return res.status(400).json({ error: "Date incomplete pentru achiziție" });
 
-// 🔁 Pornire server
+  try {
+    const userResult = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
+    if (userResult.rows.length === 0)
+      return res.status(404).json({ error: "Utilizatorul nu există" });
+    const user = userResult.rows[0];
+
+    // Adaugă în tabela purchases
+    await pool.query(
+      "INSERT INTO purchases (user_id, pack_id, ton_spent, tx_hash) VALUES ($1, $2, $3, $4)",
+      [user.id, packId, tonSpent, txHash || null]
+    );
+
+    res.json({ success: true, message: "Achiziție salvată cu succes!" });
+  } catch (err) {
+    console.error("Eroare la /api/purchase:", err);
+    res.status(500).json({ error: "Eroare la procesarea achiziției" });
+  }
+});
+
+// 💼 Obține balanța unui utilizator (FOOD + TON)
+app.get("/api/balance/:wallet", async (req, res) => {
+  try {
+    const { wallet } = req.params;
+    const result = await pool.query(
+      "SELECT food_balance FROM users WHERE wallet_address=$1",
+      [wallet]
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ error: "Utilizator inexistent" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Eroare la /api/balance:", err);
+    res.status(500).json({ error: "Eroare la obținerea balanței" });
+  }
+});
+
+// 🎯 Route fallback (pentru SPA)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// 🚀 Pornire server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server pornit pe portul ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Serverul rulează pe portul ${PORT}`));
