@@ -1,43 +1,53 @@
-/* ===== RESETE & BAZĂ ===== */
+/* === RESET ȘI BAZĂ === */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
 }
 
-body {
-  background: radial-gradient(circle at center, #0b0f1a 0%, #06080f 100%);
-  color: #f1f1f1;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+html, body {
+  height: 100%;
+  background: #0d0d0d;
+  color: #f5f5f5;
+  font-family: "Poppins", sans-serif;
+  line-height: 1.5;
 }
 
-/* ===== HEADER ===== */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* === HEADER === */
 .header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 40px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px 25px;
+  background: #141414;
+  border-bottom: 1px solid #222;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 10;
 }
 
 .brand {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #00aaff;
-  text-shadow: 0 0 15px #0077ff;
+  color: #00c8ff;
+  text-shadow: 0 0 5px #00c8ff;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .balances {
   display: flex;
-  gap: 20px;
+  gap: 25px;
 }
 
 .balance-item {
@@ -45,13 +55,19 @@ body {
 }
 
 .balance-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   opacity: 0.7;
 }
 
 .balance-value {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .wallet-controls {
@@ -61,178 +77,218 @@ body {
 }
 
 .wallet-address {
-  font-size: 0.8rem;
-  opacity: 0.8;
+  font-size: 0.85rem;
+  background: #1e1e1e;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #333;
+  color: #00c8ff;
+  min-width: 130px;
+  text-align: center;
 }
 
-.referral button {
-  font-size: 0.8rem;
-}
-
-/* ===== BUTOANE ===== */
+/* === BUTOANE === */
 .btn {
-  cursor: pointer;
-  background: linear-gradient(90deg, #0072ff, #00c6ff);
+  background: #00c8ff;
+  color: #000;
   border: none;
   padding: 10px 18px;
-  border-radius: 8px;
-  color: #fff;
   font-weight: 600;
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .btn:hover {
+  background: #00a8df;
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(0, 195, 255, 0.6);
 }
 
 .btn.small {
-  padding: 7px 14px;
+  padding: 7px 12px;
   font-size: 0.85rem;
 }
 
 .btn.tertiary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #222;
+  color: #f5f5f5;
+  border: 1px solid #333;
 }
 
 .btn.tertiary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #333;
 }
 
 .btn.outline {
   background: transparent;
-  border: 2px solid #00c6ff;
-  color: #00c6ff;
+  color: #00c8ff;
+  border: 1px solid #00c8ff;
 }
 
 .btn.outline:hover {
-  background: #00c6ff;
+  background: #00c8ff;
   color: #000;
 }
 
-/* ===== SECȚIUNEA HERO ===== */
+/* === MAIN === */
+.main {
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
 .hero {
   text-align: center;
-  padding: 60px 20px 30px;
+  margin-bottom: 30px;
 }
 
 .hero-sub {
   font-size: 1.2rem;
-  opacity: 0.85;
+  color: #ccc;
 }
 
-/* ===== PACKS ===== */
-.packs-section {
-  text-align: center;
-  padding: 40px 20px 80px;
-}
-
+/* === PACKS === */
 .section-title {
-  font-size: 2rem;
-  color: #00c6ff;
-  margin-bottom: 40px;
-  text-shadow: 0 0 10px #0077ff;
+  text-align: center;
+  font-size: 1.6rem;
+  color: #00c8ff;
+  margin-bottom: 25px;
 }
 
 .packs-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
 }
 
 .pack-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 15px;
-  padding: 25px;
-  width: 280px;
-  transition: all 0.3s ease;
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 200, 255, 0.05);
+  transition: all 0.2s ease;
 }
 
 .pack-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 0 20px rgba(0, 195, 255, 0.3);
+  transform: translateY(-4px);
+  border-color: #00c8ff;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.15);
 }
 
 .pack-card h3 {
-  color: #00c6ff;
-  font-size: 1.3rem;
   margin-bottom: 10px;
+  color: #fff;
 }
 
 .pack-price {
+  color: #00c8ff;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: #fff;
+  margin-bottom: 6px;
 }
 
 .pack-desc {
   font-size: 0.9rem;
-  opacity: 0.8;
-  margin: 6px 0 10px;
+  color: #aaa;
+  margin-bottom: 6px;
 }
 
 .pack-limit {
   font-size: 0.85rem;
-  margin-bottom: 15px;
-  color: #ccc;
-}
-
-/* Culori specifice */
-.pack-card.starter {
-  border-top: 3px solid #0ff;
-}
-
-.pack-card.epic {
-  border-top: 3px solid #a020f0;
-}
-
-.pack-card.mythic {
-  border-top: 3px solid gold;
-}
-
-/* ===== REFERRAL & WHITEPAPER ===== */
-.referral-info, .whitepaper-section {
-  text-align: center;
-  padding: 30px 20px;
-}
-
-.referral-info h2 {
-  color: #00c6ff;
+  color: #888;
   margin-bottom: 10px;
+}
+
+.pack-card .btn {
+  width: 100%;
+}
+
+/* === REFERRAL === */
+.referral-info {
+  margin-top: 40px;
+  text-align: center;
+  background: #121212;
+  padding: 25px;
+  border-radius: 10px;
+  border: 1px solid #222;
 }
 
 .ref-example {
   margin-top: 10px;
-  opacity: 0.8;
   font-size: 0.9rem;
+  color: #ccc;
+  word-break: break-all;
 }
 
-/* ===== FOOTER ===== */
+/* === WHITEPAPER === */
+.whitepaper-section {
+  text-align: center;
+  margin: 50px 0;
+}
+
+/* === FOOTER === */
 .footer {
-  margin-top: auto;
   text-align: center;
   padding: 20px;
-  font-size: 0.8rem;
-  opacity: 0.6;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #777;
+  border-top: 1px solid #222;
+  background: #0d0d0d;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
+/* === MODAL === */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10,10,10,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-inner {
+  background: #1a1a1a;
+  padding: 25px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid #333;
+}
+
+.modal-inner h3 {
+  color: #00c8ff;
+  margin-bottom: 10px;
+}
+
+.modal-inner input {
+  width: 100%;
+  padding: 10px;
+  background: #111;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 6px;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 700px) {
   .header {
     flex-direction: column;
+    align-items: flex-start;
     gap: 10px;
   }
 
-  .packs-grid {
-    flex-direction: column;
-    align-items: center;
+  .balances {
+    gap: 10px;
   }
 
-  .brand {
-    font-size: 1.4rem;
+  .wallet-address {
+    font-size: 0.75rem;
+  }
+
+  .packs-grid {
+    grid-template-columns: 1fr;
   }
 }

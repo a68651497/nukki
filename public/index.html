@@ -31,8 +31,14 @@
         <button id="connectWallet" class="btn small">Conectează Wallet</button>
         <div id="walletAddress" class="wallet-address">Neconectat</div>
       </div>
-      <div class="referral">
-        <button id="copyReferral" class="btn tertiary">Copiază referal</button>
+
+      <div class="wallet-actions" style="display:flex;gap:8px;align-items:center;margin-left:12px;">
+        <button id="depositBtn" class="btn small">Depune</button>
+        <button id="withdrawBtn" class="btn tertiary small">Retrage</button>
+      </div>
+
+      <div class="referral" style="margin-left:12px;">
+        <button id="copyReferral" class="btn tertiary small">Copiază referral</button>
       </div>
     </div>
   </header>
@@ -86,10 +92,36 @@
     <p>© 2025 Nukki Project — Toate drepturile rezervate</p>
   </footer>
 
+  <!-- Deposit modal -->
+  <div id="depositModal" class="modal" style="display:none;">
+    <div class="modal-inner">
+      <h3>Depune TON</h3>
+      <p>Introdu suma TON pe care vrei să o depui în contul tău Nukki:</p>
+      <input id="depositAmountInput" type="number" min="0" step="0.000001" placeholder="Ex: 2.5" />
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+        <button id="depositCancel" class="btn tertiary small">Anulează</button>
+        <button id="depositConfirm" class="btn small">Trimite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Withdraw modal -->
+  <div id="withdrawModal" class="modal" style="display:none;">
+    <div class="modal-inner">
+      <h3>Retrage TON</h3>
+      <p>Introdu suma TON pe care vrei să o retragi din contul Nukki către portofelul conectat:</p>
+      <input id="withdrawAmountInput" type="number" min="0" step="0.000001" placeholder="Ex: 1.0" />
+      <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+        <button id="withdrawCancel" class="btn tertiary small">Anulează</button>
+        <button id="withdrawConfirm" class="btn small">Confirmă retragere</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TonConnect UI (browser build) -->
   <script src="https://unpkg.com/@tonconnect/ui@2.0.10/dist/tonconnect-ui.min.js"></script>
 
-  <!-- Aplicatia -->
+  <!-- Aplicația -->
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,120 +1,154 @@
+// === index.js ===
+// Nukki Presale - Backend complet (Node.js + Express + PostgreSQL + TON blockchain)
+
 import express from "express";
 import cors from "cors";
-import pg from "pg";
 import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
+import fetch from "node-fetch";
+import { Pool } from "pg";
 
 dotenv.config();
 
-// 📁 Configurare de bază
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static("public"));
 
-// 🔌 Conexiune PostgreSQL
-const { Pool } = pg;
+// === CONFIG DB ===
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-pool
-  .connect()
-  .then(() => console.log("✅ Conectat la baza de date PostgreSQL"))
-  .catch((err) => console.error("❌ Eroare conexiune DB:", err));
+// === CONFIG GENERAL ===
+const TON_RECEIVER = process.env.TON_RECEIVER; // adresa TON a proiectului
+const TONCENTER_API = "https://toncenter.com/api/v2/getAddressBalance";
 
-// 🌍 Route principală (frontend)
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// === ROUTE: Config ===
+app.get("/api/config", (req, res) => {
+  res.json({ tonReceiver: TON_RECEIVER });
 });
 
-//
-// 📦 API ROUTES
-//
-
-// 🧾 Obține lista de pachete
+// === ROUTE: Lista pachete ===
 app.get("/api/packs", async (req, res) => {
   try {
-    const { rows } = await pool.query("SELECT * FROM packs ORDER BY id ASC");
-    res.json(rows);
+    const result = await pool.query("SELECT * FROM packs ORDER BY id ASC");
+    res.json({ packs: result.rows });
   } catch (err) {
-    console.error("Eroare la /api/packs:", err);
-    res.status(500).json({ error: "Eroare la preluarea pachetelor" });
+    console.error("Eroare packs:", err);
+    res.status(500).json({ error: "Eroare la obținerea pachetelor" });
   }
 });
 
-// 👤 Înregistrare / actualizare utilizator
-app.post("/api/user", async (req, res) => {
-  const { wallet, ref } = req.body;
-  if (!wallet) return res.status(400).json({ error: "Lipsește wallet-ul" });
-
-  try {
-    let user = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
-    if (user.rows.length === 0) {
-      await pool.query(
-        "INSERT INTO users (wallet_address, referred_by) VALUES ($1, $2)",
-        [wallet, ref || null]
-      );
-      user = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
-    }
-    res.json(user.rows[0]);
-  } catch (err) {
-    console.error("Eroare la /api/user:", err);
-    res.status(500).json({ error: "Eroare la înregistrare utilizator" });
-  }
-});
-
-// 💰 Achiziționare pachet
-app.post("/api/purchase", async (req, res) => {
-  const { wallet, packId, tonSpent, txHash } = req.body;
-  if (!wallet || !packId || !tonSpent)
-    return res.status(400).json({ error: "Date incomplete pentru achiziție" });
-
-  try {
-    const userResult = await pool.query("SELECT * FROM users WHERE wallet_address=$1", [wallet]);
-    if (userResult.rows.length === 0)
-      return res.status(404).json({ error: "Utilizatorul nu există" });
-    const user = userResult.rows[0];
-
-    // Adaugă în tabela purchases
-    await pool.query(
-      "INSERT INTO purchases (user_id, pack_id, ton_spent, tx_hash) VALUES ($1, $2, $3, $4)",
-      [user.id, packId, tonSpent, txHash || null]
-    );
-
-    res.json({ success: true, message: "Achiziție salvată cu succes!" });
-  } catch (err) {
-    console.error("Eroare la /api/purchase:", err);
-    res.status(500).json({ error: "Eroare la procesarea achiziției" });
-  }
-});
-
-// 💼 Obține balanța unui utilizator (FOOD + TON)
+// === ROUTE: Balanță TON ===
 app.get("/api/balance/:wallet", async (req, res) => {
   try {
     const { wallet } = req.params;
-    const result = await pool.query(
-      "SELECT food_balance FROM users WHERE wallet_address=$1",
-      [wallet]
-    );
-    if (result.rows.length === 0)
-      return res.status(404).json({ error: "Utilizator inexistent" });
-    res.json(result.rows[0]);
+    const url = `${TONCENTER_API}?address=${wallet}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!d.ok) throw new Error("Toncenter error");
+    const balanceTON = (Number(d.result) / 1e9).toFixed(4);
+    res.json({ balance: balanceTON });
   } catch (err) {
-    console.error("Eroare la /api/balance:", err);
-    res.status(500).json({ error: "Eroare la obținerea balanței" });
+    console.error("Eroare balance:", err);
+    res.status(500).json({ error: "Nu s-a putut obține balanța" });
   }
 });
 
-// 🎯 Route fallback (pentru SPA)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// === ROUTE: Date utilizator (FOOD balance) ===
+app.get("/api/user/:wallet", async (req, res) => {
+  const { wallet } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT * FROM users WHERE wallet = $1`,
+      [wallet]
+    );
+
+    if (result.rows.length === 0) {
+      await pool.query(
+        `INSERT INTO users (wallet, food_balance, referral_count) VALUES ($1, 0, 0)`,
+        [wallet]
+      );
+      return res.json({ wallet, food_balance: 0, referral_count: 0 });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Eroare user:", err);
+    res.status(500).json({ error: "Eroare la citirea utilizatorului" });
+  }
 });
 
-// 🚀 Pornire server
+// === ROUTE: Cumpărare pachet ===
+app.post("/api/purchase", async (req, res) => {
+  const { packId, buyer } = req.body;
+
+  if (!packId || !buyer) {
+    return res.status(400).json({ error: "Date invalide" });
+  }
+
+  try {
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      const packRes = await client.query(
+        `SELECT * FROM packs WHERE id = $1 FOR UPDATE`,
+        [packId]
+      );
+      const pack = packRes.rows[0];
+
+      if (!pack) throw new Error("Pachetul nu există");
+      if (pack.remaining <= 0) throw new Error("Pachet epuizat");
+
+      // Actualizează stocul
+      await client.query(
+        `UPDATE packs SET remaining = remaining - 1 WHERE id = $1`,
+        [packId]
+      );
+
+      // Înregistrează achiziția
+      await client.query(
+        `INSERT INTO purchases (wallet, pack_id, amount_ton) VALUES ($1, $2, $3)`,
+        [buyer, packId, pack.price_ton]
+      );
+
+      // Referali (2% TON + 50 FOOD)
+      const refResult = await client.query(
+        `SELECT referred_by FROM users WHERE wallet = $1`,
+        [buyer]
+      );
+      const ref = refResult.rows[0]?.referred_by;
+
+      if (ref) {
+        await client.query(
+          `UPDATE users SET food_balance = food_balance + 50 WHERE wallet = $1`,
+          [ref]
+        );
+        console.log(`Referal bonus: 50 FOOD acordat la ${ref}`);
+      }
+
+      await client.query("COMMIT");
+      res.json({ success: true, message: "Achiziție înregistrată" });
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error(err);
+      res.status(500).json({ error: err.message });
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.error("Eroare purchase:", err);
+    res.status(500).json({ error: "Eroare la achiziție" });
+  }
+});
+
+// === ROUTE fallback ===
+app.use((req, res) => res.status(404).json({ error: "Not found" }));
+
+// === SERVER ===
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`🚀 Serverul rulează pe portul ${PORT}`));
+app.listen(PORT, () =>
+  console.log(`🚀 Serverul rulează pe portul ${PORT}`)
+);
